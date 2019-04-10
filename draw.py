@@ -1,6 +1,7 @@
 from display import *
 from matrix import *
 from gmath import *
+from random import randint
 
 def scanline_convert(polygons, i, screen, zbuffer ):
     pass
@@ -18,6 +19,7 @@ def draw_polygons( polygons, screen, zbuffer, color ):
     point = 0
     while point < len(polygons) - 2:
 
+        color = [randint(0, 255), randint(0, 255), randint(0, 255)]
         normal = calculate_normal(polygons, point)[:]
         #print normal
         if normal[2] > 0:
