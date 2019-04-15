@@ -3,8 +3,32 @@ from matrix import *
 from gmath import *
 from random import randint
 
-def scanline_convert(polygons, i, screen, zbuffer ):
-    pass
+#def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
+def scanline_convert(polygons, i, screen, zbuffer, color ):
+    print polygons
+    s = sorted(polygons, key = lambda x: x[1])
+    print s[1][0]
+    print s[1][1]
+    print s[0][1]
+    print s[0][0]
+    # s = [bot, mid, top]
+    #print s
+
+    # x0 to mid
+    x0 = s[0][0]
+    y0 = s[0][1]
+    dx0 = abs( (s[1][0] - x0) / (s[1][1] - s[0][1] + 1) )
+
+    x1 = x0
+    dx1 = abs( (s[2][0] - x0) / (s[2][1] - s[0][1] + 1) )
+
+    midy = s[1][1]
+
+    while y0 < midy:
+        draw_line(int(x0), int(y0), 1, int(x1), int(y0), 1, screen, zbuffer, color)
+        x0 += dx0
+        x1 += dx1
+        y0 += 1
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0)
@@ -44,6 +68,13 @@ def draw_polygons( polygons, screen, zbuffer, color ):
                        int(polygons[point+2][1]),
                        polygons[point+2][2],
                        screen, zbuffer, color)
+            p = [
+                    polygons[point],
+                    polygons[point+1],
+                    polygons[point+2]
+                    ]
+            scanline_convert(p, 0, screen, zbuffer, color)
+
         point+= 3
 
 
