@@ -5,12 +5,10 @@ from random import randint
 
 #def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
 def scanline_convert(polygons, i, screen, zbuffer, color ):
-    print polygons
+    # https://www.techfak.uni-bielefeld.de/ags/wbski/lehre/digiSA/WS0607/3DVRCG/Vorlesung/13.RT3DCGVR-vertex-2-fragment.pdf
+    # http://web.eecs.utk.edu/courses/spring2019/cosc456/notes/456_rasterization.pdf
+    color = [randint(0, 255), randint(0, 255), randint(0, 255)]
     s = sorted(polygons, key = lambda x: x[1])
-    print s[1][0]
-    print s[1][1]
-    print s[0][1]
-    print s[0][0]
     # s = [bot, mid, top]
     #print s
 
@@ -27,7 +25,7 @@ def scanline_convert(polygons, i, screen, zbuffer, color ):
     while y0 < midy:
         draw_line(int(x0), int(y0), 1, int(x1), int(y0), 1, screen, zbuffer, color)
         x0 += dx0
-        x1 += dx1
+        x1 -= dx1
         y0 += 1
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
@@ -43,7 +41,6 @@ def draw_polygons( polygons, screen, zbuffer, color ):
     point = 0
     while point < len(polygons) - 2:
 
-        color = [randint(0, 255), randint(0, 255), randint(0, 255)]
         normal = calculate_normal(polygons, point)[:]
         #print normal
         if normal[2] > 0:
