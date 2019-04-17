@@ -4,29 +4,101 @@ from gmath import *
 from random import randint
 
 #def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
-def scanline_convert(polygons, i, screen, zbuffer, color ):
-    # https://www.techfak.uni-bielefeld.de/ags/wbski/lehre/digiSA/WS0607/3DVRCG/Vorlesung/13.RT3DCGVR-vertex-2-fragment.pdf
-    # http://web.eecs.utk.edu/courses/spring2019/cosc456/notes/456_rasterization.pdf
+def scanline_convert(polygons, screen, zbuffer, color ):
     color = [randint(0, 255), randint(0, 255), randint(0, 255)]
     s = sorted(polygons, key = lambda x: x[1])
     # s = [bot, mid, top]
+    # bot = [x,y,z]
     #print s
 
-    # x0 to mid
-    x0 = s[0][0]
-    y0 = s[0][1]
-    dx0 = abs( (s[1][0] - x0) / (s[1][1] - s[0][1] + 1) )
+    # degen triangle
+    if (s[0][1] == s[2][1]):
+        return
 
-    x1 = x0
-    dx1 = abs( (s[2][0] - x0) / (s[2][1] - s[0][1] + 1) )
+    # draw bottom of triangel
+    if (s[0][1] != s[1][1]):
+        # MID points to left
+        x0 = x1 = s[0][0] # start at bot
+        dx0 = (s[1][0] - x0) / (s[1][1] - s[0][1])
+        dx1 = (s[2][0] - x1) / (s[2][1] - s[0][1])
+        z0 = z1 = 1.0
+        y = s[0][1]
+        while y < s[1][1]:
+            draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
+            x0 += dx0
+            #z0 += dz0
+            x1 += dx1
+            #z1 += dz1
+            y += 1
 
-    midy = s[1][1]
+        ## draw top of triangle
+        #if (s[1][1] != s[2][1]):
+        #    if (s[0][0] < s[1][0]):
+        #        dx0 = (s[2][0] - s[1][0]) / (s[2][1] - s[1][1])
+        #    else:
+        #        dx1 = (s[2][0] - s[1][0]) / (s[2][1] - s[1][1])
 
-    while y0 < midy:
-        draw_line(int(x0), int(y0), 1, int(x1), int(y0), 1, screen, zbuffer, color)
-        x0 += dx0
-        x1 -= dx1
-        y0 += 1
+        #    #x0 = s[1][0]
+        #    #x1 = s[0][0]
+        #    #dx0 = (s[2][0] - x0) / (s[2][1] - s[1][1])
+        #    #dx1 = (s[2][0] - x1) / (s[2][1] - s[1][1])
+        #    z0 = z1 = 1.0
+        #    y = s[1][1]
+        #    while y < s[2][1]:
+        #        draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
+        #        x0 += dx0
+        #        #z0 += dz0
+        #        x1 += dx1
+        #        #z1 += dz1
+        #        y += 1
+
+    # draw top of tri
+    if (s[1][1] != s[2][1]):
+        #if (s[0][0] < s[1][0]):
+        #    dx0 = (s[2][0] - s[1][0]) / (s[2][1] - s[1][1])
+        #else:
+        #    dx1 = (s[2][0] - s[1][0]) / (s[2][1] - s[1][1])
+        x1 = s[1][0] # start at bot
+        x0 = s[0][0] + (s[1][1] - s[0][1])*(s[2][0] - s[0][0]) / (s[2][1] - s[0][1])
+        dx0 = (s[2][0] - x0) / (s[2][1] - s[1][1])
+        dx1 = (s[2][0] - x1) / (s[2][1] - s[1][1])
+        z0 = z1 = 1.0
+        y = s[1][1]
+        while y < s[2][1]:
+            draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
+            x0 += dx0
+            #z0 += dz0
+            x1 += dx1
+            #z1 += dz1
+            y += 1
+
+
+    
+
+
+    #if (s[0][1] == s[1][1]): # straight line on bot
+    #    pass
+    #elif (s[2][1] == s[0][1]): # degenerate
+    #    pass
+    #else:
+    #    # BOT TO MID MID LEFT OF BOT
+    #    x0 = s[0][0] # start at bot
+    #    dx0 = (s[1][0] - x0) / (s[1][1] - s[0][1])
+    #    x1 = x0
+    #    dx1 = (s[2][0] - x1) / (s[2][1] - s[0][1])
+    #    z0 = s[0][2] # start at bot
+    #    dz0 = (s[1][2] - z0) / (s[1][1] - s[0][1])
+    #    z1 = z0
+    #    dz1 = (s[2][2] - z1) / (s[2][1] - s[0][1])
+    #    y = s[0][1]
+    #    while y < s[1][1]:
+    #        draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
+    #        x0 += dx0
+    #        z0 += dz0
+    #        x1 += dx1
+    #        z1 += dz1
+    #        y += 1
+
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0)
@@ -70,7 +142,7 @@ def draw_polygons( polygons, screen, zbuffer, color ):
                     polygons[point+1],
                     polygons[point+2]
                     ]
-            scanline_convert(p, 0, screen, zbuffer, color)
+            scanline_convert(p, screen, zbuffer, color)
 
         point+= 3
 
