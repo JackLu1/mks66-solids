@@ -7,10 +7,6 @@ from random import randint
 def scanline_convert(polygons, screen, zbuffer, color ):
     color = [randint(0, 255), randint(0, 255), randint(0, 255)]
     s = sorted(polygons, key = lambda x: x[1])
-    # s = [bot, mid, top]
-    # bot = [x,y,z]
-    #print s
-
     # degen triangle
     if (s[0][1] == s[2][1]):
         return
@@ -21,83 +17,54 @@ def scanline_convert(polygons, screen, zbuffer, color ):
         x0 = x1 = s[0][0] # start at bot
         dx0 = (s[1][0] - x0) / (s[1][1] - s[0][1])
         dx1 = (s[2][0] - x1) / (s[2][1] - s[0][1])
-        z0 = z1 = 1.0
+        #z = s[0][2]
+        #if (s[1][0] != s[0][0]):
+        #    dz = (s[1][2] - s[0][2]) / (s[1][0] - s[0][0])
+        #else:
+        #    dz = 0
+        z0 = z1 = s[0][2]
+        dz0 = (s[1][2] - z0) / (s[1][0] - s[0][0]) if s[1][0] - s[0][0] != 0 else 0
+        dz1 = (s[2][2] - z1) / (s[2][0] - s[0][0]) if s[2][0] - s[0][0] != 0 else 0
+
         y = s[0][1]
         while y < s[1][1]:
+            #for i in range( int(round(x0)), int(round(x1)) ):
+            #    plot( screen, zbuffer, color, i, int(round(y)), int(round(z)) )
+            #    z += dz
+            
             draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
             x0 += dx0
-            #z0 += dz0
+            z0 += dz0
             x1 += dx1
-            #z1 += dz1
+            z1 += dz1
             y += 1
-
-        ## draw top of triangle
-        #if (s[1][1] != s[2][1]):
-        #    if (s[0][0] < s[1][0]):
-        #        dx0 = (s[2][0] - s[1][0]) / (s[2][1] - s[1][1])
-        #    else:
-        #        dx1 = (s[2][0] - s[1][0]) / (s[2][1] - s[1][1])
-
-        #    #x0 = s[1][0]
-        #    #x1 = s[0][0]
-        #    #dx0 = (s[2][0] - x0) / (s[2][1] - s[1][1])
-        #    #dx1 = (s[2][0] - x1) / (s[2][1] - s[1][1])
-        #    z0 = z1 = 1.0
-        #    y = s[1][1]
-        #    while y < s[2][1]:
-        #        draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
-        #        x0 += dx0
-        #        #z0 += dz0
-        #        x1 += dx1
-        #        #z1 += dz1
-        #        y += 1
 
     # draw top of tri
     if (s[1][1] != s[2][1]):
-        #if (s[0][0] < s[1][0]):
-        #    dx0 = (s[2][0] - s[1][0]) / (s[2][1] - s[1][1])
-        #else:
-        #    dx1 = (s[2][0] - s[1][0]) / (s[2][1] - s[1][1])
         x1 = s[1][0] # start at bot
         x0 = s[0][0] + (s[1][1] - s[0][1])*(s[2][0] - s[0][0]) / (s[2][1] - s[0][1])
         dx0 = (s[2][0] - x0) / (s[2][1] - s[1][1])
         dx1 = (s[2][0] - x1) / (s[2][1] - s[1][1])
-        z0 = z1 = 1.0
+        #z = s[0][2]
+        #if (s[1][0] != s[0][0]):
+        #    dz = (s[1][2] - s[0][2]) / (s[1][0] - s[0][0])
+        #else:
+        #    dz = 0
+        z1 = s[1][2] # start at bot
+        z0 = s[0][2] + (s[1][0] - s[0][0])*(s[2][2] - s[0][2]) / (s[2][0] - s[0][0]) if s[2][0] - s[0][0] != 0 else 0
+        dz0 = (s[2][2] - z0) / (s[2][0] - s[1][0]) if s[2][0] - s[1][0] != 0 else 0
+        dz1 = (s[2][2] - z1) / (s[2][0] - s[1][0]) if s[2][0] - s[1][0] != 0 else 0
         y = s[1][1]
         while y < s[2][1]:
+            #for i in range( int(round(x0)), int(round(x1)) ):
+            #    plot( screen, zbuffer, color, i, int(round(y)), int(round(z)) )
+            #    z += dz
             draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
             x0 += dx0
-            #z0 += dz0
+            z0 += dz0
             x1 += dx1
-            #z1 += dz1
+            z1 += dz1
             y += 1
-
-
-    
-
-
-    #if (s[0][1] == s[1][1]): # straight line on bot
-    #    pass
-    #elif (s[2][1] == s[0][1]): # degenerate
-    #    pass
-    #else:
-    #    # BOT TO MID MID LEFT OF BOT
-    #    x0 = s[0][0] # start at bot
-    #    dx0 = (s[1][0] - x0) / (s[1][1] - s[0][1])
-    #    x1 = x0
-    #    dx1 = (s[2][0] - x1) / (s[2][1] - s[0][1])
-    #    z0 = s[0][2] # start at bot
-    #    dz0 = (s[1][2] - z0) / (s[1][1] - s[0][1])
-    #    z1 = z0
-    #    dz1 = (s[2][2] - z1) / (s[2][1] - s[0][1])
-    #    y = s[0][1]
-    #    while y < s[1][1]:
-    #        draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
-    #        x0 += dx0
-    #        z0 += dz0
-    #        x1 += dx1
-    #        z1 += dz1
-    #        y += 1
 
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
