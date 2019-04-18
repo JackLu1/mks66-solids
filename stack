@@ -1,0 +1,57 @@
+
+move
+250 250 0
+
+push
+rotate
+y 45
+rotate
+x 30
+box
+-50 -50 -50 50 50 50
+push
+rotate
+z 45
+box
+-50 -50 -50 50 50 50
+push
+rotate
+z 45
+box
+-50 -50 -50 50 50 50
+push
+rotate
+z 45
+box
+-50 -50 -50 50 50 50
+push
+rotate
+z 45
+box
+-50 -50 -50 50 50 50
+push
+rotate
+z 45
+box
+-50 -50 -50 50 50 50
+push
+rotate
+z 45
+box
+-50 -50 -50 50 50 50
+push
+rotate
+z 45
+box
+-50 -50 -50 50 50 50
+pop
+pop
+pop
+pop
+pop
+pop
+pop
+pop
+display
+save
+wack.jpg
