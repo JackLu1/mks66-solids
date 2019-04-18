@@ -10,61 +10,93 @@ def scanline_convert(polygons, screen, zbuffer, color ):
     # degen triangle
     if (s[0][1] == s[2][1]):
         return
+    bot = s[0]
+    mid = s[1]
+    top = s[2]
 
-    # draw bottom of triangel
-    if (s[0][1] != s[1][1]):
-        # MID points to left
-        x0 = x1 = s[0][0] # start at bot
-        dx0 = (s[1][0] - x0) / (s[1][1] - s[0][1])
-        dx1 = (s[2][0] - x1) / (s[2][1] - s[0][1])
-        #z = s[0][2]
-        #if (s[1][0] != s[0][0]):
-        #    dz = (s[1][2] - s[0][2]) / (s[1][0] - s[0][0])
-        #else:
-        #    dz = 0
-        z0 = z1 = s[0][2]
-        dz0 = (s[1][2] - z0) / (s[1][0] - s[0][0]) if s[1][0] - s[0][0] != 0 else 0
-        dz1 = (s[2][2] - z1) / (s[2][0] - s[0][0]) if s[2][0] - s[0][0] != 0 else 0
+    #0 to mid, to top
+    #1 to top
 
-        y = s[0][1]
-        while y < s[1][1]:
-            #for i in range( int(round(x0)), int(round(x1)) ):
-            #    plot( screen, zbuffer, color, i, int(round(y)), int(round(z)) )
-            #    z += dz
-            
-            draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
-            x0 += dx0
-            z0 += dz0
-            x1 += dx1
-            z1 += dz1
-            y += 1
+    x0 = x1 = bot[0]
+    dx0 = (mid[0] - bot[0]) / (mid[1] - bot[1]) if mid[1] != bot[1] else 0
+    dx1 = (top[0] - bot[0]) / (top[1] - bot[1]) if top[1] != bot[1] else 0
+    y = bot[1]
+    z0 = z1 = bot[2]
+    dz0dy = (mid[2] - bot[2]) / (mid[1] - bot[1]) if mid[1] != bot[1] else 0
+    dz1dy = (top[2] - bot[2]) / (top[1] - bot[1]) if top[1] != bot[1] else 0
+    dzdx = (dz1dy - dz0dy) / (dx1 - dx0) if dx1 != dx0 else 0
+    while y < mid[1]:
+        draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
+        x0 += dx0
+        x1 += dx1
+        z0 += dz0dy
+        z1 += dz1dy
+        y += 1
+    x0 = mid[0]
+    dx0 = (top[0] - mid[0]) / (top[1] - mid[1]) if top[1] != mid[1] else 0
+    while y < top[1]:
+        draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
+        x0 += dx0
+        x1 += dx1
+        z0 += dz0dy
+        z1 += dz1dy
+        y += 1
 
-    # draw top of tri
-    if (s[1][1] != s[2][1]):
-        x1 = s[1][0] # start at bot
-        x0 = s[0][0] + (s[1][1] - s[0][1])*(s[2][0] - s[0][0]) / (s[2][1] - s[0][1])
-        dx0 = (s[2][0] - x0) / (s[2][1] - s[1][1])
-        dx1 = (s[2][0] - x1) / (s[2][1] - s[1][1])
-        #z = s[0][2]
-        #if (s[1][0] != s[0][0]):
-        #    dz = (s[1][2] - s[0][2]) / (s[1][0] - s[0][0])
-        #else:
-        #    dz = 0
-        z1 = s[1][2] # start at bot
-        z0 = s[0][2] + (s[1][0] - s[0][0])*(s[2][2] - s[0][2]) / (s[2][0] - s[0][0]) if s[2][0] - s[0][0] != 0 else 0
-        dz0 = (s[2][2] - z0) / (s[2][0] - s[1][0]) if s[2][0] - s[1][0] != 0 else 0
-        dz1 = (s[2][2] - z1) / (s[2][0] - s[1][0]) if s[2][0] - s[1][0] != 0 else 0
-        y = s[1][1]
-        while y < s[2][1]:
-            #for i in range( int(round(x0)), int(round(x1)) ):
-            #    plot( screen, zbuffer, color, i, int(round(y)), int(round(z)) )
-            #    z += dz
-            draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
-            x0 += dx0
-            z0 += dz0
-            x1 += dx1
-            z1 += dz1
-            y += 1
+
+    ## draw bottom of triangel
+    #dzdx = 0
+    #if (s[0][1] != s[1][1]):
+    #    # MID points to left
+    #    x0 = x1 = s[0][0] # start at bot
+    #    dx0 = (s[1][0] - x0) / (s[1][1] - s[0][1])
+    #    dx1 = (s[2][0] - x1) / (s[2][1] - s[0][1])
+
+    #    z0 = z1 = s[0][2]
+    #    dz0dy = (s[2][2] - z0) / (s[2][1] - s[0][1]) if s[2][1] != s[0][1] else 0
+    #    dz1dy = (s[1][2] - z1) / (s[1][1] - s[0][1]) if s[1][1] != s[0][1] else 0
+    #    dzdx = (dz0dy - dz1dy) / (x0 - x1) if x0 != x1 else 0
+
+    #    y = s[0][1]
+    #    while y < s[1][1]:
+    #        z = z0
+    #        for x in range( int(round(x0)), int(round(x1)) ):
+    #            plot( screen, zbuffer, color, x, int(round(y)), z )
+    #            z += dzdx
+
+    #        
+    #        draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
+    #        x0 += dx0
+    #        x1 += dx1
+    #        z0 += dz0dy
+    #        z1 += dz1dy
+    #        y += 1
+
+    ## draw top of tri
+    #if (s[1][1] != s[2][1]):
+    #    x1 = s[1][0] # start at bot
+    #    x0 = s[0][0] + (s[1][1] - s[0][1])*(s[2][0] - s[0][0]) / (s[2][1] - s[0][1])
+    #    dx0 = (s[2][0] - x0) / (s[2][1] - s[1][1])
+    #    dx1 = (s[2][0] - x1) / (s[2][1] - s[1][1])
+
+    #    z0 = s[1][2]
+    #    z1 = s[1][2] + dzdx * (s[1][1] - s[0][1])
+    #    #z0 = s[0][2] + s([1][2] - s[0][2])* (s[2][2])
+    #    dz0dy = (s[2][2] - z0) / (s[2][1] - s[1][1]) if s[2][1] != s[1][1] else 0
+    #    dz1dy = (s[1][2] - z1) / (s[1][1] - s[1][1]) if s[1][1] != s[1][1] else 0
+
+    #    y = s[1][1]
+    #    while y < s[2][1]:
+    #        #dzdx = (dz0dy - dz1dy) / (x0 - x1) if x0 != x1 else 0
+    #        z = z0
+    #        for x in range( int(round(x0)), int(round(x1)) ):
+    #            plot( screen, zbuffer, color, x, int(round(y)), z )
+    #            z += dzdx
+    #        draw_line(int(x0), int(y), int(z0), int(x1), int(y), int(z1), screen, zbuffer, color)
+    #        x0 += dx0
+    #        x1 += dx1
+    #        z0 += dz0dy
+    #        z1 += dz1dy
+    #        y += 1
 
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
@@ -374,8 +406,11 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
             loop_start = y1
             loop_end = y
 
+    dz = (z1 - z0) / (x1 - x0) if (x1 - x0) != 0 else 0
+    z = z0
     while ( loop_start < loop_end ):
-        plot( screen, zbuffer, color, x, y, 0 )
+        plot( screen, zbuffer, color, x, y, z )
+        z += dz
         if ( (wide and ((A > 0 and d > 0) or (A < 0 and d < 0))) or
              (tall and ((A > 0 and d < 0) or (A < 0 and d > 0 )))):
 
@@ -387,4 +422,4 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
             y+= dy_east
             d+= d_east
         loop_start+= 1
-    plot( screen, zbuffer, color, x, y, 0 )
+    plot( screen, zbuffer, color, x, y, z )
